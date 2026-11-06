@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MBTI 成人评估 · 基于四维度偏好的自助测评表">
+  <title>MBTI 成人评估 · 在线测评</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f2f5f9;
+      padding: 2rem 1rem;
+      color: #1e2b3c;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px -10px rgba(0, 20, 30, 0.15);
+      padding: 2rem 2rem 2.5rem;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+      color: #0b2b3c;
+      margin-bottom: 0.25rem;
+    }
+    .subhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-bottom: 2px solid #e7edf4;
+      padding-bottom: 1rem;
+    }
+    .subhead p {
+      color: #4f6579;
+      font-size: 0.95rem;
+    }
+    .scale-badge {
+      background: #e3eef9;
+      padding: 0.35rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1e5a8b;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid #dce5ed;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 720px;
+    }
+    th {
+      background: #1e3b4f;
+      color: white;
+      font-weight: 500;
+      font-size: 0.8rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      padding: 12px 6px;
+      text-align: center;
+      border-right: 1px solid #2f5268;
+    }
+    th:first-child {
+      text-align: left;
+      padding-left: 16px;
+      width: 40%;
+    }
+    th:last-child {
+      border-right: none;
+    }
+    td {
+      padding: 8px 4px;
+      border-bottom: 1px solid #e4ecf3;
+      text-align: center;
+      vertical-align: middle;
+    }
+    td:first-child {
+      text-align: left;
+      padding-left: 16px;
+      font-weight: 450;
+      color: #1e2e3e;
+      line-height: 1.4;
+      background: #fafcfe;
+      border-right: 1px solid #e4ecf3;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .rating-group {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .rating-group label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f2f6fa;
+      border: 1px solid #cddae6;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #2c4b64;
+      transition: all 0.1s ease;
+    }
+    .rating-group input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+    }
+    .rating-group input[type="radio"]:checked + label {
+      background: #1e5a8b;
+      border-color: #1e5a8b;
+      color: white;
+      box-shadow: 0 2px 6px rgba(30, 90, 139, 0.3);
+    }
+    .rating-group label:hover {
+      background: #d9e6f2;
+      border-color: #8fb4d4;
+    }
+    .pref-marker {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #eef3f8;
+      color: #1e5a8b;
+      letter-spacing: 0.4px;
+    }
+    .score-panel {
+      margin-top: 2rem;
+      background: #f8fbfe;
+      border-radius: 20px;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid #cbddee;
+    }
+    .dimension-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .dimension-card {
+      background: white;
+      border-radius: 16px;
+      padding: 0.9rem 0.6rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      border: 1px solid #d7e2ed;
+    }
+    .dimension-card .dim-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #5f7d95;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .dimension-card .score-pair {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .dimension-card .score-pair span {
+      display: inline-block;
+      min-width: 32px;
+    }
+    .dimension-card .score-pair .winner {
+      color: #0b7a3e;
+      background: #e1f5e8;
+      padding: 0 8px;
+      border-radius: 30px;
+    }
+    .type-result {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: #1e3b4f;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      color: white;
+    }
+    .type-result .type-letters {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 5px;
+      line-height: 1;
+      color: #fff;
+    }
+    .type-result .type-desc {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .btn {
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      background: #1e5a8b;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 90, 139, 0.25);
+    }
+    .btn:hover {
+      background: #13456b;
+      transform: scale(0.98);
+    }
+    .btn-outline {
+      background: white;
+      color: #1e3b4f;
+      border: 1px solid #aac2d6;
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      background: #edf3f9;
+    }
+    .footer-note {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #6b859b;
+      text-align: center;
+      border-top: 1px solid #d9e5f0;
+      padding-top: 1.2rem;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      margin-bottom: 0.5rem;
+      color: #3b5e7a;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+    .legend-dot.e { background: #f5c542; }
+    .legend-dot.i { background: #b0bec5; }
+    .legend-dot.s { background: #f5a623; }
+    .legend-dot.n { background: #8e9eab; }
+    .legend-dot.t { background: #4a90e2; }
+    .legend-dot.f { background: #b0bec5; }
+    .legend-dot.j { background: #f5c542; }
+    .legend-dot.p { background: #b0bec5; }
+    @media (max-width: 700px) {
+      .container { padding: 1.2rem; }
+      .dimension-grid { grid-template-columns: repeat(2, 1fr); }
+      .type-result { flex-direction: column; gap: 6px; text-align: center; }
+      th:first-child { width: 45%; }
+    }
+    @media (max-width: 480px) {
+      .rating-group label { width: 28px; height: 28px; font-size: 0.7rem; }
+      .dimension-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="subhead">
+    <div>
+      <h1>🧠 MBTI 成人评估</h1>
+      <p style="margin-top: 4px;">根据每项陈述的符合程度打分 · 1 = 完全不像我，5 = 非常像我</p>
+    </div>
+    <div class="scale-badge">1 – 5 评分</div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot e"></span> E 外向</span>
+    <span class="legend-item"><span class="legend-dot i"></span> I 内向</span>
+    <span class="legend-item"><span class="legend-dot s"></span> S 感觉</span>
+    <span class="legend-item"><span class="legend-dot n"></span> N 直觉</span>
+    <span class="legend-item"><span class="legend-dot t"></span> T 思考</span>
+    <span class="legend-item"><span class="legend-dot f"></span> F 情感</span>
+    <span class="legend-item"><span class="legend-dot j"></span> J 判断</span>
+    <span class="legend-item"><span class="legend-dot p"></span> P 感知</span>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="mbtiTable">
+      <thead>
+        <tr>
+          <th>陈述 STATEMENT</th>
+          <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+          <th>偏好</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="score-panel" id="resultPanel">
+    <div class="dimension-grid" id="dimensionGrid"></div>
+    <div class="type-result" id="typeResult">
+      <span class="type-desc">你的 MBTI 类型</span>
+      <span class="type-letters" id="mbtiTypeDisplay">????</span>
+      <span class="type-desc" id="typeHint">完成评估后显示</span>
+    </div>
+    <div class="btn-group">
+      <button class="btn" id="calculateBtn">📊 计算并显示结果</button>
+      <button class="btn btn-outline" id="resetBtn">↻ 重置全部</button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    MBTI® 是迈尔斯-布里格斯类型指标的注册商标 · 本测评表基于四维度偏好评估
+  </div>
+</div>
+
+<script>
+  (function() {
+    const statements = [
+      { text: "让我更感兴趣的是人而不是观点或者感受。", pref: "E" },
+      { text: "我喜欢处理事实和细节。", pref: "S" },
+      { text: "我喜欢对事物有清晰的逻辑。", pref: "T" },
+      { text: "我喜欢按照日程做事。", pref: "J" },
+      { text: "人们很难接近我。", pref: "I" },
+      { text: "我倾向于透过现象看本质。", pref: "N" },
+      { text: "随心而为胜过用智力做决定。", pref: "F" },
+      { text: "我喜欢生活中频繁的改变。", pref: "P" },
+      { text: "与别人相处能给我能量。", pref: "E" },
+      { text: "我是一个现实主义者。", pref: "S" },
+      { text: "我觉得我是客观的。", pref: "T" },
+      { text: "我喜欢仔细做计划。", pref: "J" },
+      { text: "我是一个很深刻的人。", pref: "I" },
+      { text: "有人说我不切实际。", pref: "N" },
+      { text: "我对“谁”而不是“为什么”更感兴趣。", pref: "F" },
+      { text: "我充满好奇。", pref: "P" },
+      { text: "我喜欢和他人互动。", pref: "E" },
+      { text: "我喜欢活在当下。", pref: "S" },
+      { text: "我一直根据原则做决定。", pref: "T" },
+      { text: "我很果断。", pref: "J" },
+      { text: "我喜欢反思生活。", pref: "I" },
+      { text: "我很理想化。", pref: "N" },
+      { text: "劝说永远比强迫好。", pref: "F" },
+      { text: "我喜欢惊喜。", pref: "P" },
+      { text: "我有很多朋友和熟人。", pref: "E" },
+      { text: "我是一个务实的人。", pref: "S" },
+      { text: "有时候人们需要强硬。", pref: "T" },
+      { text: "我总是很准时。", pref: "J" },
+      { text: "我有几个好朋友就够了。", pref: "I" },
+      { text: "我倾向于展望未来。", pref: "N" },
+      { text: "我为保持人与人之间的和谐关系而努力。", pref: "F" },
+      { text: "我喜欢新奇和多样性。", pref: "P" },
+      { text: "我是一个社交型的人。", pref: "E" },
+      { text: "我倾向于具体的、一板一眼的方式。", pref: "S" },
+      { text: "我喜欢分析为什么发生这些事情。", pref: "T" },
+      { text: "坚持到底对我来说很重要。", pref: "J" },
+      { text: "与人相处让我筋疲力尽。", pref: "I" },
+      { text: "激发对我而言很重要。", pref: "N" },
+      { text: "我总是很同情别人。", pref: "F" },
+      { text: "我的生活态度比较悠闲。", pref: "P" },
+    ];
+
+    const tbody = document.getElementById('tableBody');
+    statements.forEach((item, index) => {
+      const tr = document.createElement('tr');
+
+      const tdText = document.createElement('td');
+      tdText.textContent = item.text;
+      tr.appendChild(tdText);
+
+      for (let score = 1; score <= 5; score++) {
+        const td = document.createElement('td');
+        const div = document.createElement('div');
+        div.className = 'rating-group';
+        const inputId = `q${index}_${score}`;
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = `q${index}`;
+        radio.value = score;
+        radio.id = inputId;
+        const label = document.createElement('label');
+        label.htmlFor = inputId;
+        label.textContent = score;
+        div.appendChild(radio);
+        div.appendChild(label);
+        td.appendChild(div);
+        tr.appendChild(td);
+      }
+
+      const tdPref = document.createElement('td');
+      const span = document.createElement('span');
+      span.className = 'pref-marker';
+      span.textContent = item.pref;
+      tdPref.appendChild(span);
+      tr.appendChild(tdPref);
+
+      tbody.appendChild(tr);
+    });
+
+    const dimensionGrid = document.getElementById('dimensionGrid');
+    const mbtiTypeDisplay = document.getElementById('mbtiTypeDisplay');
+    const typeHint = document.getElementById('typeHint');
+
+    function updateDimensionCards(scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 }) {
+      const pairs = [
+        { left: 'E', right: 'I', label: '外向 / 内向' },
+        { left: 'S', right: 'N', label: '感觉 / 直觉' },
+        { left: 'T', right: 'F', label: '思考 / 情感' },
+        { left: 'J', right: 'P', label: '判断 / 感知' }
+      ];
+
+      dimensionGrid.innerHTML = '';
+      pairs.forEach(pair => {
+        const card = document.createElement('div');
+        card.className = 'dimension-card';
+
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'dim-label';
+        labelDiv.textContent = pair.label;
+
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'score-pair';
+
+        const leftScore = scores[pair.left] || 0;
+        const rightScore = scores[pair.right] || 0;
+
+        const leftSpan = document.createElement('span');
+        leftSpan.textContent = `${pair.left} ${leftScore}`;
+        if (leftScore > rightScore) leftSpan.classList.add('winner');
+
+        const rightSpan = document.createElement('span');
+        rightSpan.textContent = `${pair.right} ${rightScore}`;
+        if (rightScore > leftScore) rightSpan.classList.add('winner');
+
+        scoreDiv.appendChild(leftSpan);
+        scoreDiv.appendChild(rightSpan);
+
+        card.appendChild(labelDiv);
+        card.appendChild(scoreDiv);
+        dimensionGrid.appendChild(card);
+      });
+    }
+
+    updateDimensionCards();
+
+    function calculateMBTI() {
+      const allRadios = document.querySelectorAll('#mbtiTable input[type="radio"]:checked');
+      if (allRadios.length !== statements.length) {
+        alert('请完成所有40道题目后再计算。');
+        return null;
+      }
+
+      const scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+
+      statements.forEach((item, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (selected) {
+          const val = parseInt(selected.value, 10);
+          if (scores.hasOwnProperty(item.pref)) {
+            scores[item.pref] += val;
+          }
+        }
+      });
+
+      const type = [
+        scores.E >= scores.I ? 'E' : 'I',
+        scores.S >= scores.N ? 'S' : 'N',
+        scores.T >= scores.F ? 'T' : 'F',
+        scores.J >= scores.P ? 'J' : 'P'
+      ].join('');
+
+      return { scores, type };
+    }
+
+    function updateResultUI() {
+      const result = calculateMBTI();
+      if (!result) return;
+
+      const { scores, type } = result;
+      updateDimensionCards(scores);
+      mbtiTypeDisplay.textContent = type;
+
+      const typeDescriptions = {
+        'ENFP': '热情、创意、社交 · 可能性探索者',
+        'ENFJ': '利他、引导、合作 · 人际关怀者',
+        'ENTP': '思辨、创新、挑战 · 发明家',
+        'ENTJ': '果断、战略、领导 · 指挥官',
+        'INFP': '理想、敏感、忠诚 · 调停者',
+        'INFJ': '洞察、共情、远见 · 提倡者',
+        'INTP': '逻辑、分析、理论 · 逻辑学家',
+        'INTJ': '独立、战略、理性 · 建筑师',
+        'ESFP': '活泼、体验、社交 · 表演者',
+        'ESFJ': '友善、组织、支持 · 执政官',
+        'ESTP': '大胆、行动、现实 · 企业家',
+        'ESTJ': '高效、秩序、执行 · 总经理',
+        'ISFP': '温和、艺术、探索 · 探险家',
+        'ISFJ': '守护、细致、奉献 · 守卫者',
+        'ISTP': '冷静、工具、灵活 · 鉴赏家',
+        'ISTJ': '责任、事实、可靠 · 物流师'
+      };
+      typeHint.textContent = typeDescriptions[type] || '独特的人格类型';
+    }
+
+    function resetForm() {
+      document.querySelectorAll('#mbtiTable input[type="radio"]').forEach(r => {
+        r.checked = false;
+      });
+      updateDimensionCards({ E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 });
+      mbtiTypeDisplay.textContent = '????';
+      typeHint.textContent = '完成评估后显示';
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', updateResultUI);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+  })();
+</script>
+</body>
+</html>
